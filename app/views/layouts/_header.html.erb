@@ -1,0 +1,45 @@
+<header class="navbar navbar-fixed-top navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <%= link_to "Collective Intelligence", root_path, id: "logo" %>
+      <nav>
+        <ul class="nav pull-right">
+
+          <li id="fat-menu" class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              About <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li><%= link_to "About", about_path %></li>
+              <li><%= link_to "Contact", contact_path  %></li>
+              <li class="divider"></li>
+              <li><%= link_to "Help", help_path  %></li>
+              <li><%= link_to "Home", root_path  %></li>
+            </ul>
+          </li>
+
+          <% if user_signed_in? %>
+          <li><%= link_to "Users", users_path %></li>
+          <li id="fat-menu" class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              Account <b class="caret"></b>
+            </a>
+
+            <ul class="dropdown-menu">
+              <li><%= link_to "プロフィール変更", edit_user_registration_path  %></li>
+              <li class="divider"></li>
+              <li>
+                <%= link_to "ログアウト", destroy_user_session_path, method: "delete" %>
+              </li>
+            </ul>
+          </li>
+          <li><%= link_to current_user.email, user_path(current_user) %></li>
+          <% else %>
+          <li><%= link_to "Sign_up", new_user_registration_path %></li>
+          <li><%= link_to "Sign_in", new_user_session_path %></li>
+          <% end %>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
