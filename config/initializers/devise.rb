@@ -242,8 +242,8 @@ Devise.setup do |config|
     config.omniauth :facebook,  "App ID", "App Secret"
     config.omniauth :twitter,   "Consumer key", "Consumer secret"
   else
-    config.omniauth :facebook,  "886732118027472", "a1a3e8caf16c2caf02c90049947631f7"
-    config.omniauth :twitter, "TXxq8OqL2dmhmv9llXUWDUcBq", "zRuvaL5kPhCwZdaAX197qVZqVBtUnDdlDVKK4wtdxagnmRUWqB"
+    config.omniauth :facebook,  ENV["FACEBOOK_APP_ID"], ENV["FACEBOOK_APP_SECRET"]
+    config.omniauth :twitter, ENV["TWITTER_APP_ID"], ENV["TWITTER_APP_SECRET"]
   end
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
