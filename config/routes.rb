@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
 
   #get "users/index"
-  devise_for :users
+  devise_for :users, path_names: { sign_in: "login", sign_out: "logout"},
+    controllers: { omniauth_callbacks: "omniauth_callbacks" }
+
   resources :users, only: [:index, :show]
   get "static_pages/home"
   resources :entries

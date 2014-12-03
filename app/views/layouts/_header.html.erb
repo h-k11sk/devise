@@ -33,10 +33,13 @@
               </li>
             </ul>
           </li>
-          <li><%= link_to current_user.email, user_path(current_user) %></li>
+          <li><%= link_to current_user.username, user_path(current_user) %></li>
           <% else %>
           <li><%= link_to "Sign_up", new_user_registration_path %></li>
           <li><%= link_to "Sign_in", new_user_session_path %></li>
+          <li><%= link_to "Twitter", user_omniauth_authorize_path(:twitter) %></li>
+          <li><%= link_to "Facebook", user_omniauth_authorize_path(:facebook) %></li>
+          
           <% end %>
         </ul>
       </nav>
