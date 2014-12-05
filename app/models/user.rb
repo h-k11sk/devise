@@ -4,6 +4,9 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable,:omniauthable
 
+  validates :username, presence: true, uniqueness: true
+  validates :email, presence: true
+
 
 
 
@@ -38,16 +41,6 @@ class User < ActiveRecord::Base
   def self.create_unique_email
     User.create_unique_string + "@example.com"
   end
-
-
-
-
-
-
-
-
-
-
 
 
 

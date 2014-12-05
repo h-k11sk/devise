@@ -1,13 +1,15 @@
 Rails.application.routes.draw do
 
-  #get "users/index"
+  resources :books
+
   devise_for :users, path_names: { sign_in: "login", sign_out: "logout"},
     controllers: { omniauth_callbacks: "omniauth_callbacks" }
 
   resources :users, only: [:index, :show]
+
   get "static_pages/home"
-  resources :entries
-  root to: 'entries#index'
+  root to: 'static_pages#home'
+
   match '/help',    to: 'static_pages#help',    via: 'get'
   match '/about',   to: 'static_pages#about',   via: 'get'
   match '/contact', to: 'static_pages#contact', via: 'get'
