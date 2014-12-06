@@ -5,13 +5,18 @@ Rails.application.routes.draw do
   devise_for :users, path_names: { sign_in: "login", sign_out: "logout"},
     controllers: { omniauth_callbacks: "omniauth_callbacks" }
 
-  resources :users, only: [:index, :show]
+  resources :users, only: [:index, :show] do
+    member do
+      get :following, :followers
+    end
+  end
+
 
   get "static_pages/home"
   root to: 'static_pages#home'
 
   resources :microposts, only: [:create, :destroy]
-
+  resources :relationships, only: [:create, :destroy]
 
   match '/help',    to: 'static_pages#help',    via: 'get'
   match '/about',   to: 'static_pages#about',   via: 'get'
