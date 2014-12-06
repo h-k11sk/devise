@@ -1,2 +1,4 @@
-
-<li> <%= link_to user.email, user %></li>
+<li>
+  <%= gravatar_for user, size: 52 %>
+  <%= link_to user.username, user %>
+</li>
