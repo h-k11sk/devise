@@ -241,9 +241,11 @@ Devise.setup do |config|
   if Rails.env.production?
     config.omniauth :facebook,  "App ID", "App Secret"
     config.omniauth :twitter,   "Consumer key", "Consumer secret"
+    config.omniauth :google_oauth2, 'APP_ID', 'APP_SECRET'
   else
     config.omniauth :facebook,  ENV["FACEBOOK_APP_ID"], ENV["FACEBOOK_APP_SECRET"]
     config.omniauth :twitter, ENV["TWITTER_APP_ID"], ENV["TWITTER_APP_SECRET"]
+    config.omniauth :google_oauth2, ENV["Google_APP_ID"], ENV["Google_APP_SECRET"]
   end
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or

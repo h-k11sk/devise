@@ -20,6 +20,7 @@ gem 'therubyracer'
 gem 'devise'
 gem 'omniauth-twitter'
 gem 'omniauth-facebook'
+gem 'omniauth-google-oauth2'
 
 gem 'dotenv-rails'
 

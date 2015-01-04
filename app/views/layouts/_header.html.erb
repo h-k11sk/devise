@@ -19,6 +19,7 @@
           </li>
 
           <li><%= link_to "Books", books_path %></li>
+          <li><%= link_to "Events", events_path %></li>
           <% if user_signed_in? %>
           <li><%= link_to "Users", users_path %></li>
           <li id="fat-menu" class="dropdown">
@@ -40,7 +41,7 @@
           <li><%= link_to "Sign_in", new_user_session_path %></li>
           <li><%= link_to "Twitter", user_omniauth_authorize_path(:twitter) %></li>
           <li><%= link_to "Facebook", user_omniauth_authorize_path(:facebook) %></li>
-          
+          <li><%= link_to 'Signin with Google', user_omniauth_authorize_path(:google_oauth2) %></li>
           <% end %>
         </ul>
       </nav>
