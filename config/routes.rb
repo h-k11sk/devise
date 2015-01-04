@@ -18,6 +18,16 @@ Rails.application.routes.draw do
   resources :microposts, only: [:create, :destroy]
   resources :relationships, only: [:create, :destroy]
 
+  resources :events do
+    collection do
+      get :get_events
+    end
+    member do
+      post :move
+      post :resize
+    end
+  end
+
   match '/help',    to: 'static_pages#help',    via: 'get'
   match '/about',   to: 'static_pages#about',   via: 'get'
   match '/contact', to: 'static_pages#contact', via: 'get'

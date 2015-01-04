@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141206130541) do
+ActiveRecord::Schema.define(version: 20150103135019) do
 
   create_table "books", force: true do |t|
     t.string   "title"
@@ -21,6 +21,29 @@ ActiveRecord::Schema.define(version: 20141206130541) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "event_series", force: true do |t|
+    t.integer  "frequency",  default: 1
+    t.string   "period",     default: "monthly"
+    t.datetime "starttime"
+    t.datetime "endtime"
+    t.boolean  "all_day",    default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "events", force: true do |t|
+    t.string   "title"
+    t.datetime "starttime"
+    t.datetime "endtime"
+    t.boolean  "all_day",         default: false
+    t.text     "description"
+    t.integer  "event_series_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "events", ["event_series_id"], name: "index_events_on_event_series_id"
 
   create_table "microposts", force: true do |t|
     t.string   "content"
