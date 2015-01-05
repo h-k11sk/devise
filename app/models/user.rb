@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
 
 
 
-   def self.find_for_facebook_oauth(auth, signed_in_resource=nil)
+  def self.find_for_facebook_oauth(auth, signed_in_resource=nil)
     user = User.where(:provider => auth.provider, :uid => auth.uid).first
     unless user
       user = User.create(username:     auth.extra.raw_info.name,
@@ -42,16 +42,16 @@ class User < ActiveRecord::Base
   end
 
 
-  def self.find_for_google_oauth2(auth)
+  def self.find_for_google_oauth2(auth, signed_in_resource=nil)
     user = User.where(email: auth.info.email).first
- 
+    @refresh_token = auth.credentials.refresh_token
+    @expires_at = auth.credentials.expires_at
     unless user
       user = User.create(username:     auth.info.name,
                          provider: auth.provider,
                          uid:      auth.uid,
-                         email:    auth.info.email
-                         )
-                        # token:    auth.credentials.token)
+                         email:    auth.info.email,
+                         token:    auth.credentials.token)
                         # password: Devise.friendly_token[0, 20])
     end
     user

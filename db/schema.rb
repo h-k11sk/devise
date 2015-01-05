@@ -81,6 +81,7 @@ ActiveRecord::Schema.define(version: 20150103135019) do
     t.string   "username"
     t.string   "provider"
     t.string   "uid"
+    t.string   "token"
     t.string   "name"
   end
 
