@@ -23,80 +23,62 @@ class Event < ActiveRecord::Base
 
 
 
-  def self.get_google_events(user)
-    puts "#{user.email}"
-    client = Event.init_google_client(user)
-    service = client.discovered_api('calendar', 'v3')
+def self.get_google_events(user)
+  client = Event.init_google_client(user)
+  service = client.discovered_api('calendar', 'v3')
+
+  # 時間を格納
+  #time_min = Time.utc(2014, 12, 1, 0).iso8601
+  time_min = (Time.now - 6.month).utc.iso8601
+  time_max = (Time.now + 6.month).utc.iso8601
 
 
-# 時間を格納
-#time_min = Time.utc(2014, 12, 1, 0).iso8601
-time_min = (Time.now - 6.month).utc.iso8601
-#time_max = Time.utc(2015, 12, 31, 0).iso8601
-#time_max = Time.now.next_month.utc.iso8601
-time_max = (Time.now + 6.month).utc.iso8601
+  params = {
+   'calendarId' => "#{user.email}",
+   'timeMin' => time_min,
+   'timeMax' => time_max,
+   'singleEvents' => 'True'
+  }
 
 
-    p service
-    params = {
-     'calendarId' => "#{user.email}",
-     'timeMin' => time_min,
-     'timeMax' => time_max,
-     'singleEvents' => 'True'
-      #grant_type: user.token
-    }
+  result = client.execute(
+      api_method: service.events.list,
+      parameters: params)    
 
+#  p result.data
+#  p result.data.items
 
-
-    result = client.execute(
-  #    api_method: service.calendar_list.list,
-  api_method: service.events.list,
-  parameters: params)    
-    #p result
-    puts 
-   # p result.data
-   puts 
-    #p result.data.items
-   
-   events = []
-   result.data.items.each do |item|
-        events << item
-  end
-
-   events.each do |event|
-     printf("%s,%s\n",event.start.date,event.summary)
-   end
-   puts 
-
-
-
-
-return result.data.items
+  return result.data.items
 end
+
 
 
 def self.init_google_client(user)
   client = Google::APIClient.new(application_name: "Refebook")
-   # client.authorization.client_id = "25672067812-2nk5mfseprvc6nivfgjoougi3ku2ckuj.apps.googleusercontent.com"
-   # client.authorization.client_secret = "a1qjttYMo22CgTdEuAPFVtPL"
-   client.authorization.access_token = user.token
-   # client.authorization.scope =  "https://www.googleapis.com/auth/calendar"
-    #client.authorization.redirect_uri = "http://localhost:3000/users/auth/google_oauth2/callback"
-   # client.authorization.grant_type =  user.token
-   #client.authorization.fetch_access_token!
-   puts user.token
-   puts 
-   return client
- end
+  client.authorization.client_id = ENV["Google_APP_ID"] 
+  client.authorization.client_secret = ENV["Google_APP_SECRET"]
+  #client.authorization.scope =  'https://www.googleapis.com/auth/calendar'
+  client.authorization.access_token = user.token
+  client.authorization.refresh_token = user.refresh_token
+  client.authorization.grant_type = 'refresh_token'
+  client.authorization.fetch_access_token!
+
+
+#  if client.authorization.expired?
+#    client.authorization.grant_type = 'refresh_token'
+#    client.authorization.fetch_access_token!
+#  end
+  
+  return client
+end
 
 
 
- def validate_timings
+def validate_timings
   if (starttime >= endtime) and !all_day
     errors[:base] << "Start Time must be less than End Time"
   end
 end
-
 
 
 def update_events(events, event)

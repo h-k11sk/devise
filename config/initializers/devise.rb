@@ -245,7 +245,7 @@ Devise.setup do |config|
   else
     config.omniauth :facebook,  ENV["FACEBOOK_APP_ID"], ENV["FACEBOOK_APP_SECRET"]
     config.omniauth :twitter, ENV["TWITTER_APP_ID"], ENV["TWITTER_APP_SECRET"]
-    config.omniauth :google_oauth2, ENV["Google_APP_ID"], ENV["Google_APP_SECRET"], {scope: 'userinfo.email userinfo.profile https://www.googleapis.com/auth/calendar'}
+    config.omniauth :google_oauth2, ENV["Google_APP_ID"], ENV["Google_APP_SECRET"],  {scope: 'userinfo.email userinfo.profile https://www.googleapis.com/auth/calendar'}
   end
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or

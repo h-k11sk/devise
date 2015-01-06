@@ -7,6 +7,9 @@ class EventsController < ApplicationController
     before_filter :determine_event_type, only: :create
 
 
+    def index
+      
+    end
 
 
     def create
@@ -42,33 +45,23 @@ class EventsController < ApplicationController
                     start: event.starttime.iso8601,
                     end: event.endtime.iso8601,
                     allDay: event.all_day,
-                    #color: "red".
+                    color: "#4c6cb3",
                     recurring: (event.event_series_id) ? true : false }
       end
 
 
       # google calendar 
-       @get_events = Event.get_google_events(current_user)
-       @get_events.each do |g|
-        events << { 
-                    title: g.summary,
-                    start: g.start["dateTime"],
-                    end: g.end["dateTime"],   
-                    allDay: false,
-                    color: "#c53d43"}
-      end
-
-     # events.each do |event|
-     #     printf("%s,%s\n",event.start.date,event.summary)
-     # end
-     #puts events 
-     
-
-
-
-
-
-
+       if current_user.token?
+           @get_events = Event.get_google_events(current_user)
+           @get_events.each do |g|
+            events << { 
+                        title: g.summary,
+                        start: g.start["dateTime"],
+                        end: g.end["dateTime"],   
+                        allDay: false,
+                        color: "#c53d43"}
+          end
+       end
 
       render json: events.to_json
     end

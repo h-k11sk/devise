@@ -4,6 +4,8 @@ class AddColumnsToUsers < ActiveRecord::Migration
     add_column :users, :uid, :string
     add_column :users, :token, :string 
     add_column :users, :name,     :string
-    add_index :users, [:uid, :provider], unique: true
+    add_column :users, :refresh_token, :string
+    add_column :users, :expires_in, :timestamp
+    add_index :users, [:uid, :provider, :token, :refresh_token], unique: true
   end
 end

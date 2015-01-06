@@ -44,14 +44,14 @@ class User < ActiveRecord::Base
 
   def self.find_for_google_oauth2(auth, signed_in_resource=nil)
     user = User.where(email: auth.info.email).first
-    @refresh_token = auth.credentials.refresh_token
-    @expires_at = auth.credentials.expires_at
     unless user
       user = User.create(username:     auth.info.name,
                          provider: auth.provider,
                          uid:      auth.uid,
                          email:    auth.info.email,
-                         token:    auth.credentials.token)
+                         token:    auth.credentials.token,
+                         refresh_token: auth.credentials.refresh_token,
+                         expires_in: auth.credentials.expires_in)
                         # password: Devise.friendly_token[0, 20])
     end
     user
