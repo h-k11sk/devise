@@ -126,7 +126,9 @@ class EventsController < ApplicationController
     private
 
     def load_event
-      @event = Event.where(:id => params[:id]).first
+
+      @event = current_user.events.find_by(id: params[:id])
+      
       unless @event
         render json: { message: "Event Not Found.."}, status: 404 and return
       end
