@@ -8,7 +8,7 @@ Configuration = {
     right: 'month,agendaWeek,agendaDay'
   },
  # 'defaultView' => 'agendaWeek',
-  'height'      => 500,
+  'height'      => 600,
   'slotMinutes' => 15,
   'dragOpacity' => 0.5,
   'selectable'  => true,

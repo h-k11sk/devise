@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
- # before_action :authenticate_user!
+    before_action :authenticate_user!
 
     #layout Configuration['layout'] || 'application'
 
@@ -13,6 +13,7 @@ class EventsController < ApplicationController
 
 
     def create
+      p  @event.user_id  = current_user.id      
       if @event.save
         render nothing: true
       else
@@ -30,15 +31,18 @@ class EventsController < ApplicationController
     def get_events
       start_time = Time.at(params[:start].to_i).to_formatted_s(:db)
       end_time   = Time.at(params[:end].to_i).to_formatted_s(:db)
+      puts "start_time: #{start_time}"
+      puts "end_time: #{end_time}"
 
-      @events = Event.where('
-                  (starttime >= :start_time and endtime <= :end_time) or
-                  (starttime >= :start_time and endtime > :end_time and starttime <= :end_time) or
-                  (starttime <= :start_time and endtime >= :start_time and endtime <= :end_time) or
-                  (starttime <= :start_time and endtime > :end_time)',
-                  start_time: start_time, end_time: end_time)
+      st = Time.now
+
+      @event_feeds = current_user.event_feed(start_time, end_time)
+      puts "feedの時間: #{Time.now - st}"
+      
+
+      #@event_feeds = current_user.event_feed
       events = []
-      @events.each do |event|
+      @event_feeds.each do |event|
         events << { id: event.id,
                     title: event.title,
                     description: event.description || '', 
@@ -50,7 +54,8 @@ class EventsController < ApplicationController
       end
 
 
-      # google calendar 
+      # google calendar
+   
        if current_user.token?
            @get_events = Event.get_google_events(current_user)
            @get_events.each do |g|
