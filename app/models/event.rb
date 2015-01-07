@@ -17,11 +17,11 @@ class Event < ActiveRecord::Base
 
 
   REPEATS = {
-    :no_repeat => "Does not repeat",
-    :days      => "Daily",
-    :weeks     => "Weekly",
-    :months    => "Monthly",
-    :years     => "Yearly"
+    :no_repeat => "なし",
+    :days      => "毎日",
+    :weeks     => "毎週",
+    :months    => "毎月",
+    :years     => "毎年"
   }
 
 
@@ -44,10 +44,8 @@ class Event < ActiveRecord::Base
     client = Event.init_google_client(user)
     service = client.discovered_api('calendar', 'v3')
 
-    # 時間を格納
-    #time_min = Time.utc(2014, 12, 1, 0).iso8601
-    time_min = (Time.now - 6.month).utc.iso8601
-    time_max = (Time.now + 6.month).utc.iso8601
+    time_min = (Time.now - 1.month).utc.iso8601
+    time_max = (Time.now + 1.month).utc.iso8601
 
     params = {
      'calendarId' => "#{user.email}",
@@ -56,9 +54,11 @@ class Event < ActiveRecord::Base
      'singleEvents' => 'True'
     }
 
+    st1 = Time.now 
     result = client.execute(
         api_method: service.events.list,
         parameters: params)    
+    puts "client execute: #{Time.now - st1}"
 
    # p result.data
    # p result.data.items
@@ -72,16 +72,15 @@ class Event < ActiveRecord::Base
     client = Google::APIClient.new(application_name: "Refebook")
     client.authorization.client_id = ENV["Google_APP_ID"] 
     client.authorization.client_secret = ENV["Google_APP_SECRET"]
-    #client.authorization.scope =  'https://www.googleapis.com/auth/calendar'
+    client.authorization.scope =  'https://www.googleapis.com/auth/calendar'
     client.authorization.access_token = user.token
     client.authorization.refresh_token = user.refresh_token
-    client.authorization.grant_type = 'refresh_token'
-    client.authorization.fetch_access_token!
 
-  #  if client.authorization.expired?
-  #    client.authorization.grant_type = 'refresh_token'
-  #    client.authorization.fetch_access_token!
-  #  end
+    if client.authorization.refresh_token && client.authorization.expired?
+      client.authorization.grant_type = 'refresh_token'
+      client.authorization.fetch_access_token!
+    end
+
     return client
   end
 
@@ -99,7 +98,7 @@ class Event < ActiveRecord::Base
       begin 
         old_start_time, old_end_time = e.starttime, e.endtime
         e.attributes = event
-        if event_series.period.downcase == 'monthly' or event_series.period.downcase == 'yearly'
+        if event_series.period == '毎月' or event_series.period == '毎年'
           new_start_time = make_date_time(e.starttime, old_start_time) 
           new_end_time   = make_date_time(e.starttime, old_end_time, e.endtime)
         else

@@ -1,10 +1,9 @@
 class EventSeries < ActiveRecord::Base
-	    attr_accessor :title, :description, :commit_button
-
-    validates :frequency, :period, :starttime, :endtime,  :presence => true
-
+	  attr_accessor :title, :description, :commit_button
+    belongs_to :user
     has_many :events, :dependent => :destroy
 
+    validates :frequency, :period, :starttime, :endtime,  :presence => true
     after_create :create_events_until_end_time
 
     def create_events_until_end_time(end_time=RECURRING_EVENTS_UPTO)
@@ -19,12 +18,13 @@ class EventSeries < ActiveRecord::Base
                             :description => description, 
                             :all_day => all_day, 
                             :starttime => new_start_time, 
-                            :endtime => new_end_time
+                            :endtime => new_end_time,
+                            :user_id => self.user_id
                           )
         new_start_time = old_start_time = frequency.send(frequency_period).from_now(old_start_time)
         new_end_time   = old_end_time   = frequency.send(frequency_period).from_now(old_end_time)
 
-        if period.downcase == 'monthly' or period.downcase == 'yearly'
+        if period == '毎月' or period == '毎年'
           begin 
             new_start_time = make_date_time(starttime, old_start_time)
             new_end_time   = make_date_time(endtime, old_end_time)

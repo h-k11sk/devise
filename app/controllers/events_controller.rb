@@ -13,7 +13,6 @@ class EventsController < ApplicationController
 
 
     def create
-      p  @event.user_id  = current_user.id      
       if @event.save
         render nothing: true
       else
@@ -31,17 +30,10 @@ class EventsController < ApplicationController
     def get_events
       start_time = Time.at(params[:start].to_i).to_formatted_s(:db)
       end_time   = Time.at(params[:end].to_i).to_formatted_s(:db)
-      puts "start_time: #{start_time}"
-      puts "end_time: #{end_time}"
-
-      st = Time.now
 
       @event_feeds = current_user.event_feed(start_time, end_time)
-      puts "feedの時間: #{Time.now - st}"
-      
-
-      #@event_feeds = current_user.event_feed
       events = []
+
       @event_feeds.each do |event|
         events << { id: event.id,
                     title: event.title,
@@ -55,7 +47,7 @@ class EventsController < ApplicationController
 
 
       # google calendar
-   
+      st1 = Time.now  
        if current_user.token?
            @get_events = Event.get_google_events(current_user)
            @get_events.each do |g|
@@ -67,6 +59,8 @@ class EventsController < ApplicationController
                         color: "#c53d43"}
           end
        end
+
+       puts "google apiの全実行時間： #{Time.now - st1}"
 
       render json: events.to_json
     end
@@ -139,10 +133,12 @@ class EventsController < ApplicationController
     end
 
     def determine_event_type
-      if params[:event][:period] == "Does not repeat"
-        @event = Event.new(event_params)
+      if params[:event][:period] == "なし"
+#        @event = Event.new(event_params)
+        @event = current_user.events.build(event_params)
       else
-        @event = EventSeries.new(event_params)
+    #    @event = EventSeries.new(event_params)
+        @event = current_user.event_series.build(event_params)
       end
     end
 
