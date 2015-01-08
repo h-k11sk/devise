@@ -97,6 +97,17 @@ class User < ActiveRecord::Base
     Event.from_users_followed_by(self, start_time, end_time)
   end
 
+  def delete_gcal_excess(g_events)
+    self.events.each do |my_event|
+      my_event.destroy if my_event.exist_only_refebook?(g_events)
+    end
+  end
+
+
+
+
+
+
 
   def following?(other_user)
     relationships.find_by(followed_id: other_user.id)

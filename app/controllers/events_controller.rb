@@ -12,21 +12,28 @@ class EventsController < ApplicationController
   end
 
   def get_gcal_events
-    if current_user.token?
+    if current_user.token? 
       st1 = Time.now
       get_gcal_events = Event.get_google_events(current_user)
       puts "google apiの全実行時間： #{Time.now - st1}"
 
-      get_gcal_events.each do |g|
+      g_events = []
+      get_gcal_events.each do |g_event|
         @event = current_user.events.build(
-            title: g.summary,
-            starttime: g.start["dateTime"],
-            endtime: g.end["dateTime"],
-            all_day: false
+            title: g_event.summary,
+            starttime: g_event.start["dateTime"],
+            endtime: g_event.end["dateTime"]
           )
-        @event.save if @event.gcal_unique?(current_user)
+
+        @event.starttime, @event.endtime = g_event.start["date"], g_event.end["date"] if @event.starttime.nil? # allDayを表示するため
+
+        @event.save if @event.gcal_unique?(current_user) 
+        g_events << @event
       end
+      current_user.delete_gcal_excess(g_events)
     end
+
+    puts "イベント更新の実行時間： #{Time.now - st1}"
 
     redirect_to events_path
   end

@@ -25,6 +25,7 @@ class Event < ActiveRecord::Base
   }
 
 
+  # "フォローしているユーザーの情報を獲得する"
   def self.from_users_followed_by(user, start_time, end_time)
     followed_user_ids = "SELECT followed_id FROM relationships
                          WHERE follower_id = :user_id"
@@ -37,29 +38,46 @@ class Event < ActiveRecord::Base
   end
 
 
+  # "Google Calendar上にしかない情報を取得する"
   def gcal_unique?(user)
     unique_event = user.events.where("
           (title == :title) and 
           (starttime == :start_time) and 
           (endtime == :end_time)",
           title: self.title, start_time: self.starttime, end_time: self.endtime)
-
     return unique_event.empty? ? true : false 
   end
 
 
+  #"refebook上にしか無い情報を削除する"
+  def exist_only_refebook?(g_events)
+    i = 0
+    g_events.each do |g_event|
+      if self.title == g_event.title and self.starttime == g_event.starttime and self.endtime == g_event.endtime
+  #      puts "両方にあるよ！"
+        i = i + 1
+      end
+    end
+    puts "Refebookにしかないよ！" if i == 0
+    return i == 0 ? true : false 
+  end
+
+
+
+  #"google calendar apiを叩く"
   def self.get_google_events(user)
     client = Event.init_google_client(user)
     service = client.discovered_api('calendar', 'v3')
 
-    time_min = (Time.now - 1.month).utc.iso8601
-    time_max = (Time.now + 1.month).utc.iso8601
+    time_min = (Time.now - 5.year).utc.iso8601
+    time_max = (Time.now + 2.year).utc.iso8601
 
     params = {
      'calendarId' => "#{user.email}",
+     'maxResults' => "2500",
      'timeMin' => time_min,
-     'timeMax' => time_max,
-     'singleEvents' => 'True'
+     'timeMax' => time_max
+    # 'singleEvents' => 'True'
     }
 
     st1 = Time.now 
@@ -69,13 +87,14 @@ class Event < ActiveRecord::Base
     puts "client execute: #{Time.now - st1}"
 
    # p result.data
-   # p result.data.items
+    p result.data.items
+    puts 
 
     return result.data.items
   end
 
 
-
+  #"Google APIのクライアントを初期化"
   def self.init_google_client(user)
     client = Google::APIClient.new(application_name: "Refebook")
     client.authorization.client_id = ENV["Google_APP_ID"] 
