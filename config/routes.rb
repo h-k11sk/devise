@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   resources :events do
     collection do
       get :get_events
+      get :get_gcal_events
     end
     member do
       post :move

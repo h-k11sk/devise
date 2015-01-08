@@ -1,6 +1,10 @@
 <p>
   <%= link_to 'Create Event', 'javascript:void()', id: 'new_event' %>
 </p>
+<p>
+  <%= link_to 'イベント情報の更新', action: 'get_gcal_events', method: 'get' %>
+</p>
+
 <div>
   <div class='calendar'></div>
 </div>

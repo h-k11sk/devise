@@ -37,7 +37,15 @@ class Event < ActiveRecord::Base
   end
 
 
+  def gcal_unique?(user)
+    unique_event = user.events.where("
+          (title == :title) and 
+          (starttime == :start_time) and 
+          (endtime == :end_time)",
+          title: self.title, start_time: self.starttime, end_time: self.endtime)
 
+    return unique_event.empty? ? true : false 
+  end
 
 
   def self.get_google_events(user)
