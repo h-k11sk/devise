@@ -13,9 +13,9 @@ class EventsController < ApplicationController
 
   def get_gcal_events
     if current_user.token? 
-      st1 = Time.now
+     # st1 = Time.now
       get_gcal_events = Event.get_google_events(current_user)
-      puts "google apiの全実行時間： #{Time.now - st1}"
+     # puts "google apiの全実行時間： #{Time.now - st1}"
 
       g_events = []
       get_gcal_events.each do |g_event|
@@ -33,7 +33,7 @@ class EventsController < ApplicationController
       current_user.delete_gcal_excess(g_events)
     end
 
-    puts "イベント更新の実行時間： #{Time.now - st1}"
+    #puts "イベント更新の実行時間： #{Time.now - st1}"
 
     redirect_to events_path
   end

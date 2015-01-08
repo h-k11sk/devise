@@ -87,8 +87,7 @@ class Event < ActiveRecord::Base
     puts "client execute: #{Time.now - st1}"
 
    # p result.data
-    p result.data.items
-    puts 
+   # p result.data.items
 
     return result.data.items
   end
