@@ -12,35 +12,44 @@ class EventsController < ApplicationController
   end
 
   def get_gcal_events
-    if current_user.token? 
-     # st1 = Time.now
+    if current_user.token?
+      # st1 = Time.now
       get_gcal_events = Event.get_google_events(current_user)
-     # puts "google apiの全実行時間： #{Time.now - st1}"
+      # puts "google apiの全実行時間： #{Time.now - st1}"
 
       g_events = []
       get_gcal_events.each do |g_event|
         @event = current_user.events.build(
-            title: g_event.summary,
-            starttime: g_event.start["dateTime"],
-            endtime: g_event.end["dateTime"]
-          )
+          title: g_event.summary,
+          starttime: g_event.start["dateTime"],
+          endtime: g_event.end["dateTime"],
+          gcal_id: g_event.id
+        )
 
-        @event.starttime, @event.endtime = g_event.start["date"], g_event.end["date"] if @event.starttime.nil? # allDayを表示するため
+        if @event.starttime.nil?
+          @event.starttime, @event.endtime = g_event.start["date"], g_event.end["date"]
+        else
+          @event.starttime = @event.starttime + 9.hour
+          @event.endtime = @event.endtime + 9.hour
+        end
 
-        @event.save if @event.gcal_unique?(current_user) 
+        @event.save if @event.gcal_unique?(current_user)
         g_events << @event
+
       end
       current_user.delete_gcal_excess(g_events)
     end
 
     #puts "イベント更新の実行時間： #{Time.now - st1}"
 
-     redirect_to current_user
+    redirect_to current_user
   end
 
 
   def create
     if @event.save
+      @event.gcal_id = Event.insert_google_event(current_user, @event) 
+      @event.save
       render nothing: true
     else
       render text: @event.errors.full_messages.to_sentence, status: 422
@@ -81,6 +90,8 @@ class EventsController < ApplicationController
       @event.endtime   = make_time_from_minute_and_day_delta(@event.endtime)
       @event.all_day   = params[:all_day]
       @event.save
+
+      Event.update_google_event(current_user, @event)
     end
     render nothing: true
   end
@@ -89,6 +100,7 @@ class EventsController < ApplicationController
     if @event
       @event.endtime = make_time_from_minute_and_day_delta(@event.endtime)
       @event.save
+      Event.update_google_event(current_user, @event)
     end
     render nothing: true
   end
@@ -109,6 +121,7 @@ class EventsController < ApplicationController
     else
       @event.attributes = event_params
       @event.save
+      Event.update_google_event(current_user, @event)
     end
     render nothing: true
   end
@@ -122,10 +135,14 @@ class EventsController < ApplicationController
                                                  start_time: @event.starttime.to_formatted_s(:db)).to_a
       @event.event_series.events.delete(@events)
     else
+      Event.delete_google_event(current_user, @event)
       @event.destroy
     end
     render nothing: true
   end
+
+
+
 
   private
 

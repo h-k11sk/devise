@@ -97,10 +97,16 @@ class User < ActiveRecord::Base
     Event.from_users_followed_by(self, start_time, end_time)
   end
 
+  # "refebookにあって、Google Calendar上にない情報を削除する"
   def delete_gcal_excess(g_events)
     self.events.each do |my_event|
       my_event.destroy if my_event.exist_only_refebook?(g_events)
     end
+  end
+
+  # "refebokで作成したイベントを、Google calendarと同期"
+  def create_event_in_gcal(r_event)
+
   end
 
 

@@ -64,7 +64,7 @@ class Event < ActiveRecord::Base
 
 
 
-  #"google calendar apiを叩く"
+  #READ: "google calendar apiを叩く"
   def self.get_google_events(user)
     client = Event.init_google_client(user)
     service = client.discovered_api('calendar', 'v3')
@@ -77,6 +77,7 @@ class Event < ActiveRecord::Base
      'maxResults' => "2500",
      'timeMin' => time_min,
      'timeMax' => time_max
+#     'timeZone' => "tokyo"
     # 'singleEvents' => 'True'
     }
 
@@ -91,6 +92,91 @@ class Event < ActiveRecord::Base
 
     return result.data.items
   end
+
+  
+  # CREATE: "refebokで作成したイベントを、Google calendarと同期"
+  def self.insert_google_event(user, r_event)
+    client = Event.init_google_client(user)
+    service = client.discovered_api('calendar', 'v3')
+
+    event_resources = {
+      'summary' => r_event.title,
+      'start' => {'dateTime' => r_event.starttime - 9.hour},
+      'end' => {'dateTime' => r_event.endtime - 9.hour}
+      #'id' => {}
+    }
+
+    params = {
+     'calendarId' => "#{user.email}"
+    }
+
+
+    result = client.execute(
+        api_method: service.events.insert,
+        parameters: params,
+        body: JSON.dump(event_resources),
+        headers: {'Content-Type' => 'application/json'}
+      )
+   # puts result.data.id
+    return result.data.id
+  end
+
+
+  
+  #"UPDATE: Refebookで更新したデータをgoogleでも更新"
+  def self.update_google_event(user, r_event)
+
+    client = Event.init_google_client(user)
+    service = client.discovered_api('calendar', 'v3')
+
+    params = {
+     'calendarId' => "#{user.email}",
+     'eventId' => "#{r_event.gcal_id}"
+    }
+
+    g_result = client.execute(
+        api_method: service.events.get,
+        parameters: params
+      )
+
+    # puts 
+    # puts "更新前： #{g_result.data.start["dateTime"]}"
+
+    new_event = g_result.data
+    new_event.summary = r_event.title
+    new_event.start["dateTime"] = r_event.starttime
+    new_event.end["dateTime"] = r_event.endtime
+
+    # puts 
+    # puts "更新後： #{r_event.starttime}"
+
+    client.execute(
+        api_method: service.events.update,
+        parameters: params,
+        body_object: new_event,
+        headers: {'Content-Type' => 'application/json'}
+      )
+
+  end
+
+
+
+  #"DELETE: Refebookで削除したイベントは、Google Caldar上でも削除"
+  def self.delete_google_event(user, r_event)
+    client = Event.init_google_client(user)
+    service = client.discovered_api('calendar', 'v3')
+
+    params = {
+     'calendarId' => "#{user.email}",
+     'eventId' => "#{r_event.gcal_id}"
+    }
+
+    client.execute(
+        api_method: service.events.delete,
+        parameters: params)
+  end
+
+
 
 
   #"Google APIのクライアントを初期化"

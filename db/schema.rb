@@ -45,10 +45,11 @@ ActiveRecord::Schema.define(version: 20150107101459) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
+    t.string   "gcal_id"
   end
 
   add_index "events", ["event_series_id"], name: "index_events_on_event_series_id"
-  add_index "events", ["user_id"], name: "index_events_on_user_id"
+  add_index "events", ["user_id", "gcal_id"], name: "index_events_on_user_id_and_gcal_id"
 
   create_table "microposts", force: true do |t|
     t.string   "content"
