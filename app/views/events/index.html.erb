@@ -1,8 +1,12 @@
+<%# 
 <p>
   <%= link_to 'Create Event', 'javascript:void()', id: 'new_event' %>
-</p>
+<%#</p>%>
+
+
+
 <p>
-  <%= link_to 'イベント情報の更新', action: 'get_gcal_events', method: 'get' %>
+  <%= link_to 'イベント情報の更新',   action: 'get_gcal_events', method: 'get' %>
 </p>
 
 <div>
@@ -21,9 +25,14 @@
 
 
 
+
 <script>
+  // window.location.reload();
+
+
   $(document).ready(function(){
     $('.calendar').fullCalendar(full_calendar_options);
+    //window.location.reload();
     
     // page is now ready, initialize the calendar...
     $('#new_event').click(function(event) {

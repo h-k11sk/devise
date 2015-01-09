@@ -16,6 +16,9 @@ gem 'twitter-bootstrap-rails', '2.2.8'
 gem 'therubyracer'
 #gem 'simple_form'
 
+
+gem 'jquery-turbolinks'
+
 # devise
 gem 'devise'
 gem 'omniauth-twitter'

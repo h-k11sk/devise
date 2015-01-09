@@ -35,7 +35,7 @@ class EventsController < ApplicationController
 
     #puts "イベント更新の実行時間： #{Time.now - st1}"
 
-    redirect_to events_path
+     redirect_to current_user
   end
 
 
