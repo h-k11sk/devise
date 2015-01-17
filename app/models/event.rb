@@ -44,7 +44,7 @@ class Event < ActiveRecord::Base
           (title == :title) and
           (starttime == :start_time) and
           (endtime == :end_time)",
-            title: self.title, start_time: self.starttime, end_time: self.endtime)
+            title: self.title.to_s, start_time: self.starttime, end_time: self.endtime)
           return unique_event.empty? ? true : false
   end
 
