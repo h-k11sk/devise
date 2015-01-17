@@ -114,7 +114,7 @@ class EventsController < ApplicationController
    #     @event.gcal_id = gcal_id if @event.class == Event
         @event.gcal_id = gcal_id 
         @event.save
-        end
+      end
       render nothing: true
     else
       render text: @event.errors.full_messages.to_sentence, status: 422
@@ -160,7 +160,7 @@ class EventsController < ApplicationController
       @event.save
 
       if current_user.token?
-      g_event = Event.update_google_event(current_user, @event, before_starttime)
+        g_event = Event.update_google_event(current_user, @event, before_starttime)
 
         if g_event != "SINGLE"
           @event.destroy
@@ -184,10 +184,11 @@ class EventsController < ApplicationController
     if @event
       @event.endtime = make_time_from_minute_and_day_delta(@event.endtime)
       @event.save
+
       if current_user.token?
         g_event = Event.update_google_event(current_user, @event, before_starttime)
 
-        if g_event != "single"
+        if g_event != "SINGLE"
           @event.destroy
           current_user.events.create(
             title: g_event.summary,
@@ -225,6 +226,7 @@ class EventsController < ApplicationController
     else
       @event.attributes = event_params
       @event.save
+
       if current_user.token?
         g_event = Event.update_google_event(current_user, @event, before_starttime)
 
