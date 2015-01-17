@@ -71,6 +71,7 @@ class EventsController < ApplicationController
           if g_event.status != "cancelled"
             @event = current_user.events.build(
               title: g_event.summary,
+              description: g_event.description,
               starttime: g_event.start["dateTime"],
               endtime: g_event.end["dateTime"],
               gcal_id: g_event.id
@@ -108,10 +109,12 @@ class EventsController < ApplicationController
       puts
       puts "4. createメソッドの中だよ"
       p @event 
-      gcal_id = Event.insert_google_event(current_user, @event) 
- #     @event.gcal_id = gcal_id if @event.class == Event
-      @event.gcal_id = gcal_id 
-      @event.save
+      if current_user.token?
+        gcal_id = Event.insert_google_event(current_user, @event)
+   #     @event.gcal_id = gcal_id if @event.class == Event
+        @event.gcal_id = gcal_id 
+        @event.save
+        end
       render nothing: true
     else
       render text: @event.errors.full_messages.to_sentence, status: 422
@@ -156,18 +159,20 @@ class EventsController < ApplicationController
       @event.all_day   = params[:all_day]
       @event.save
 
+      if current_user.token?
       g_event = Event.update_google_event(current_user, @event, before_starttime)
 
-      if g_event != "SINGLE"
-        @event.destroy
-        current_user.events.create(
-          title: g_event.summary,
-          starttime: g_event.start["dateTime"] + 9.hour,
-          endtime: g_event.end["dateTime"] + 9.hour,
-          gcal_id: g_event.id
-        )
+        if g_event != "SINGLE"
+          @event.destroy
+          current_user.events.create(
+            title: g_event.summary,
+            starttime: g_event.start["dateTime"] + 9.hour,
+            endtime: g_event.end["dateTime"] + 9.hour,
+            gcal_id: g_event.id
+          )
 
-        puts "新規イベント作成したよ！"
+          puts "新規イベント作成したよ！"
+        end
       end
     end
     render nothing: true
@@ -179,18 +184,20 @@ class EventsController < ApplicationController
     if @event
       @event.endtime = make_time_from_minute_and_day_delta(@event.endtime)
       @event.save
-      g_event = Event.update_google_event(current_user, @event, before_starttime)
+      if current_user.token?
+        g_event = Event.update_google_event(current_user, @event, before_starttime)
 
-      if g_event != "single"
-        @event.destroy
-        current_user.events.create(
-          title: g_event.summary,
-          starttime: g_event.start["dateTime"] + 9.hour,
-          endtime: g_event.end["dateTime"] + 9.hour,
-          gcal_id: g_event.id
-        )
+        if g_event != "single"
+          @event.destroy
+          current_user.events.create(
+            title: g_event.summary,
+            starttime: g_event.start["dateTime"] + 9.hour,
+            endtime: g_event.end["dateTime"] + 9.hour,
+            gcal_id: g_event.id
+          )
 
-        puts "新規イベント作成したよ！"
+          puts "新規イベント作成したよ！"
+        end
       end
     end
     render nothing: true
@@ -209,7 +216,7 @@ class EventsController < ApplicationController
       @events = @event.event_series.events
       @event.update_events(@events, event_params)
       puts "イベントアップデートした後だよ"
-      Event.update_google_all_or_future_event(current_user, @event, before_starttime, event_params)
+      Event.update_google_all_or_future_event(current_user, @event, before_starttime, event_params)   if current_user.token?
     when 'Update All Following Occurrence'
       @events = @event.event_series.events.where('starttime > :start_time',
                                                  start_time: @event.starttime.to_formatted_s(:db)).to_a
@@ -218,19 +225,20 @@ class EventsController < ApplicationController
     else
       @event.attributes = event_params
       @event.save
+      if current_user.token?
+        g_event = Event.update_google_event(current_user, @event, before_starttime)
 
-      g_event = Event.update_google_event(current_user, @event, before_starttime)
+        if g_event != "SINGLE"
+          @event.destroy
+          current_user.events.create(
+            title: g_event.summary,
+            starttime: g_event.start["dateTime"] + 9.hour,
+            endtime: g_event.end["dateTime"] + 9.hour,
+            gcal_id: g_event.id
+          )
 
-      if g_event != "SINGLE"
-        @event.destroy
-        current_user.events.create(
-          title: g_event.summary,
-          starttime: g_event.start["dateTime"] + 9.hour,
-          endtime: g_event.end["dateTime"] + 9.hour,
-          gcal_id: g_event.id
-        )
-
-        puts "新規イベント作成したよ！"
+          puts "新規イベント作成したよ！"
+        end
       end
     end
     render nothing: true
@@ -240,14 +248,14 @@ class EventsController < ApplicationController
   def destroy
     case params[:delete_all]
     when 'true'
-      Event.delete_google_event(current_user, @event)
+      Event.delete_google_event(current_user, @event) if current_user.token?
       @event.event_series.destroy
     when 'future'
       @events = @event.event_series.events.where('starttime > :start_time',
                                                  start_time: @event.starttime.to_formatted_s(:db)).to_a
       @event.event_series.events.delete(@events)
     else
-      Event.delete_google_event(current_user, @event)
+      Event.delete_google_event(current_user, @event) if current_user.token?
       @event.destroy
     end
     render nothing: true
