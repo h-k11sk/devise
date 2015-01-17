@@ -239,9 +239,9 @@ Devise.setup do |config|
 
     # API key
   if Rails.env.production?
-    config.omniauth :facebook,  "App ID", "App Secret"
-    config.omniauth :twitter,   "Consumer key", "Consumer secret"
-    config.omniauth :google_oauth2, 'APP_ID', 'APP_SECRET'
+    config.omniauth :facebook,  ENV["PRODUCTION_FACEBOOK_APP_ID"], ENV["PRODUCTION_FACEBOOK_APP_SECRET"]
+    config.omniauth :twitter,   ENV["PRODUCTION_TWITTER_APP_ID"], ENV["PRODUCTION_TWITTER_APP_SECRET"]
+    config.omniauth :google_oauth2, ENV["PRODUCTION_Google_APP_ID"], ENV["PRODUCTION_Google_APP_SECRET"], {scope: 'userinfo.email userinfo.profile https://www.googleapis.com/auth/calendar'}
   else
     config.omniauth :facebook,  ENV["FACEBOOK_APP_ID"], ENV["FACEBOOK_APP_SECRET"]
     config.omniauth :twitter, ENV["TWITTER_APP_ID"], ENV["TWITTER_APP_SECRET"]
