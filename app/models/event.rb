@@ -41,9 +41,9 @@ class Event < ActiveRecord::Base
   # "Google Calendar上にしかない情報を取得する"
   def gcal_unique?(user)
     unique_event = user.events.where("
-          (title == :title) and
-          (starttime == :start_time) and
-          (endtime == :end_time)",
+          (title = :title) and
+          (starttime = :start_time) and
+          (endtime = :end_time)",
             title: self.title, start_time: self.starttime, end_time: self.endtime)
           return unique_event.empty? ? true : false
   end
