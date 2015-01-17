@@ -69,8 +69,8 @@ class Event < ActiveRecord::Base
     client = Event.init_google_client(user)
     service = client.discovered_api('calendar', 'v3')
 
-    time_min = (Time.now - 1.month).utc.iso8601
-    time_max = (Time.now + 1.month).utc.iso8601
+    time_min = (Time.now - 5.year).utc.iso8601
+    time_max = (Time.now + 2.year).utc.iso8601
 
     params = {
       'calendarId' => "#{user.email}",
@@ -148,6 +148,7 @@ class Event < ActiveRecord::Base
       puts "呼ばれてないよ！"
       event_resources = {
         'summary' => r_event.title,
+        'description' => r_event.description,
         'start' => {'dateTime' => r_event.starttime - 9.hour},
         'end' => {'dateTime' => r_event.endtime - 9.hour}
       #'id' => {}
@@ -191,6 +192,7 @@ class Event < ActiveRecord::Base
       #"gcal送信用イベント更新"
       new_event = g_result.data
       new_event.summary = r_event.title
+      new_event.description = r_event.description
       new_event.start["dateTime"] = r_event.starttime - 9.hour
       new_event.end["dateTime"] = r_event.endtime - 9.hour
 
