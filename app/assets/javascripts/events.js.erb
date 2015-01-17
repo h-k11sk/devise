@@ -127,7 +127,7 @@ FullcalendarEngine = {
         // Cannot be refactored as of now, the event bubbling of the eventClick of the fullCalendar is the culprit
         $delete_event.html("&nbsp; <a href = 'javascript:void(0);' onclick ='FullcalendarEngine.Events.delete(" + event.id + ", " + false + ")'>このイベントのみ削除</a>");
         $delete_event.append("&nbsp;&nbsp; <a href = 'javascript:void(0);' onclick ='FullcalendarEngine.Events.delete(" + event.id + ", " + true + ")'>全てのイベントを削除</a>")
-        $delete_event.append("&nbsp;&nbsp; <a href = 'javascript:void(0);' onclick ='FullcalendarEngine.Events.delete(" + event.id + ", \"future\")'>全ての今後のイベントを削除</a>")
+        $delete_event.append("&nbsp;&nbsp; <a href = 'javascript:void(0);' onclick ='FullcalendarEngine.Events.delete(" + event.id + ", \"future\")'>今後の全てのイベントを削除</a>")
       } else {
         title = event.title;
         $delete_event.html("<a href = 'javascript:void(0);' onclick ='FullcalendarEngine.Events.delete(" + event.id + ", " + false + ")'>削除</a>");
@@ -142,20 +142,21 @@ FullcalendarEngine = {
       });
     },
     showPeriodAndFrequency: function(value){
+      console.log(value);
       switch (value) {
-        case 'Daily':
+        case '毎日':
           $('#period').html('day');
           $('#frequency').show();
           break;
-        case 'Weekly':
+        case '毎週':
           $('#period').html('week');
           $('#frequency').show();
           break;
-        case 'Monthly':
+        case '毎月':
           $('#period').html('month');
           $('#frequency').show();
           break;
-        case 'Yearly':
+        case '毎年':
           $('#period').html('year');
           $('#frequency').show();
           break;

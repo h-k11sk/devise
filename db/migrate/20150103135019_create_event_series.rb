@@ -1,6 +1,8 @@
 class CreateEventSeries < ActiveRecord::Migration
   def change
     create_table :event_series do |t|
+      t.string :title
+      t.text :description
       t.integer :frequency, default: 1
       t.string :period, default: 'monthly'
       t.datetime :starttime

@@ -23,17 +23,20 @@ ActiveRecord::Schema.define(version: 20150107101459) do
   end
 
   create_table "event_series", force: true do |t|
-    t.integer  "frequency",  default: 1
-    t.string   "period",     default: "monthly"
+    t.string   "title"
+    t.text     "description"
+    t.integer  "frequency",   default: 1
+    t.string   "period",      default: "monthly"
     t.datetime "starttime"
     t.datetime "endtime"
-    t.boolean  "all_day",    default: false
+    t.boolean  "all_day",     default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
+    t.string   "gcal_id"
   end
 
-  add_index "event_series", ["user_id"], name: "index_event_series_on_user_id"
+  add_index "event_series", ["user_id", "gcal_id"], name: "index_event_series_on_user_id_and_gcal_id"
 
   create_table "events", force: true do |t|
     t.string   "title"

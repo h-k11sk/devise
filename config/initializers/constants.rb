@@ -1,1 +1,1 @@
-RECURRING_EVENTS_UPTO = (Date.today.beginning_of_year + 2.years).to_time
+RECURRING_EVENTS_UPTO = (Date.today.beginning_of_year + 3.years).to_time
